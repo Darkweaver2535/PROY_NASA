@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from apps.exoplanet_ai import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('apps.exoplanet_ai.urls')),
+    path('', views.dashboard_view, name='home'),  # Dashboard en la raíz
+    path('exoplanet-ai/', include('apps.exoplanet_ai.urls')),
 ]

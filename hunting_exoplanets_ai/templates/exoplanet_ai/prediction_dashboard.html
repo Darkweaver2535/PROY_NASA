@@ -1,0 +1,654 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Predicción de Exoplanetas - NASA AI Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c2b 0%, #1a1a3a 50%, #2d1b69 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Estrellas de fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: twinkle 20s infinite;
+            z-index: -1;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.3; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .prediction-form {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .prediction-results {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-section h2 {
+            margin-bottom: 20px;
+            color: #4ecdc4;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+        }
+
+        .btn-sample {
+            background: linear-gradient(45deg, #a8e6cf, #7fcdcd);
+            color: #333;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            margin-top: 20px;
+        }
+
+        .prediction-result {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .prediction-label {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .confidence-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 20px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .probabilities {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .probability-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .probability-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .model-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #4ecdc4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            color: #ff6b6b;
+        }
+
+        .success {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid #4ecdc4;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            color: #4ecdc4;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .probabilities {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Colores para diferentes clases */
+        .confirmed { color: #4ecdc4; }
+        .candidate { color: #ffd93d; }
+        .false-positive { color: #ff6b6b; }
+
+        .confirmed-bg { background: linear-gradient(45deg, #4ecdc4, #45b7d1); }
+        .candidate-bg { background: linear-gradient(45deg, #ffd93d, #ffab00); }
+        .false-positive-bg { background: linear-gradient(45deg, #ff6b6b, #ff8e53); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚀 Predicción de Exoplanetas</h1>
+            <p>Sistema de Machine Learning para clasificación de exoplanetas NASA</p>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number confirmed">{{ confirmed_count }}</div>
+                <div class="stat-label">Exoplanetas Confirmados</div>
+                <div class="stat-label">({{ confirmed_percentage }}%)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number candidate">{{ candidate_count }}</div>
+                <div class="stat-label">Candidatos</div>
+                <div class="stat-label">({{ candidate_percentage }}%)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number false-positive">{{ false_positive_count }}</div>
+                <div class="stat-label">Falsos Positivos</div>
+                <div class="stat-label">({{ false_positive_percentage }}%)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ total_objects }}</div>
+                <div class="stat-label">Total de Objetos</div>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="main-content">
+            <!-- Formulario de predicción -->
+            <div class="prediction-form">
+                <h2>🔮 Predicción de Exoplaneta</h2>
+                <form id="predictionForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="orbital_period">Período Orbital (días)</label>
+                            <input type="number" id="orbital_period" name="orbital_period" step="0.001" placeholder="ej: 3.52" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transit_duration">Duración del Tránsito (horas)</label>
+                            <input type="number" id="transit_duration" name="transit_duration" step="0.001" placeholder="ej: 2.83" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="planetary_radius">Radio Planetario (Radio Tierra)</label>
+                            <input type="number" id="planetary_radius" name="planetary_radius" step="0.001" placeholder="ej: 1.27" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transit_depth">Profundidad del Tránsito (ppm)</label>
+                            <input type="number" id="transit_depth" name="transit_depth" step="0.001" placeholder="ej: 1243" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="impact_parameter">Parámetro de Impacto</label>
+                            <input type="number" id="impact_parameter" name="impact_parameter" step="0.001" placeholder="ej: 0.45" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="equilibrium_temperature">Temperatura de Equilibrio (K)</label>
+                            <input type="number" id="equilibrium_temperature" name="equilibrium_temperature" step="0.1" placeholder="ej: 1204" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stellar_temperature">Temperatura Estelar (K)</label>
+                            <input type="number" id="stellar_temperature" name="stellar_temperature" step="0.1" placeholder="ej: 5777" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stellar_radius">Radio Estelar (Radio Solar)</label>
+                            <input type="number" id="stellar_radius" name="stellar_radius" step="0.001" placeholder="ej: 1.0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stellar_mass">Masa Estelar (Masa Solar)</label>
+                            <input type="number" id="stellar_mass" name="stellar_mass" step="0.001" placeholder="ej: 1.0" required>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">
+                            🔮 Predecir Exoplaneta
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                            🗑️ Limpiar Formulario
+                        </button>
+                        <button type="button" class="btn btn-sample" onclick="loadSampleData('confirmed')">
+                            ✅ Ejemplo Confirmado
+                        </button>
+                        <button type="button" class="btn btn-sample" onclick="loadSampleData('candidate')">
+                            🤔 Ejemplo Candidato
+                        </button>
+                        <button type="button" class="btn btn-sample" onclick="loadSampleData('false_positive')">
+                            ❌ Ejemplo Falso Positivo
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Resultados de predicción -->
+            <div class="prediction-results">
+                <h2>📊 Resultados de Predicción</h2>
+                
+                <div class="loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Analizando exoplaneta...</p>
+                </div>
+
+                <div id="results" style="display: none;">
+                    <div class="prediction-result">
+                        <div class="prediction-label" id="predictionLabel">
+                            Esperando predicción...
+                        </div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceFill" style="width: 0%;"></div>
+                        </div>
+                        <div style="text-align: center; margin-bottom: 10px;">
+                            <strong>Confianza: <span id="confidenceText">0%</span></strong>
+                        </div>
+                    </div>
+
+                    <div class="probabilities">
+                        <div class="probability-item">
+                            <div class="probability-value confirmed" id="confirmedProb">0%</div>
+                            <div>Confirmado</div>
+                        </div>
+                        <div class="probability-item">
+                            <div class="probability-value candidate" id="candidateProb">0%</div>
+                            <div>Candidato</div>
+                        </div>
+                        <div class="probability-item">
+                            <div class="probability-value false-positive" id="falsePositiveProb">0%</div>
+                            <div>Falso Positivo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="errorMessage" class="error" style="display: none;"></div>
+                <div id="successMessage" class="success" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Información del modelo -->
+        {% if active_model %}
+        <div class="model-info">
+            <h3>🤖 Modelo Activo: {{ active_model.name }}</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ active_model.accuracy|floatformat:3 }}</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ active_model.f1_score|floatformat:3 }}</div>
+                    <div class="stat-label">F1-Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ active_model.precision|floatformat:3 }}</div>
+                    <div class="stat-label">Precision</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ active_model.recall|floatformat:3 }}</div>
+                    <div class="stat-label">Recall</div>
+                </div>
+            </div>
+            <p style="margin-top: 15px; opacity: 0.8;">
+                <strong>Algoritmo:</strong> {{ active_model.get_algorithm_display }}<br>
+                <strong>Entrenado con:</strong> {{ active_model.training_size }} objetos<br>
+                <strong>Última actualización:</strong> {{ active_model.created_at|date:"d/m/Y H:i" }}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        let sampleData = {};
+
+        // Cargar datos de muestra al cargar la página
+        fetch('/exoplanet-ai/api/sample-data/')
+            .then(response => response.json())
+            .then(data => {
+                sampleData = data.samples;
+            })
+            .catch(error => console.log('Error cargando datos de muestra:', error));
+
+        // Manejar envío del formulario
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Mostrar loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+
+            // Recopilar datos del formulario
+            const formData = new FormData(this);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                data[key] = parseFloat(value);
+            }
+
+            // Enviar predicción
+            fetch('/exoplanet-ai/api/predict/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById('loading').style.display = 'none';
+                
+                if (result.success) {
+                    showPredictionResult(result);
+                } else {
+                    showError(result.error || 'Error desconocido');
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                showError('Error de conexión: ' + error.message);
+            });
+        });
+
+        function showPredictionResult(result) {
+            const prediction = result.prediction;
+            const confidence = result.confidence;
+            const probabilities = result.probabilities;
+
+            // Mostrar etiqueta de predicción
+            const predictionLabel = document.getElementById('predictionLabel');
+            let labelText = '';
+            let labelClass = '';
+
+            switch(prediction) {
+                case 'CONFIRMED':
+                    labelText = '✅ Exoplaneta Confirmado';
+                    labelClass = 'confirmed';
+                    break;
+                case 'CANDIDATE':
+                    labelText = '🤔 Candidato a Exoplaneta';
+                    labelClass = 'candidate';
+                    break;
+                case 'FALSE_POSITIVE':
+                    labelText = '❌ Falso Positivo';
+                    labelClass = 'false-positive';
+                    break;
+            }
+
+            predictionLabel.textContent = labelText;
+            predictionLabel.className = 'prediction-label ' + labelClass;
+
+            // Mostrar barra de confianza
+            const confidenceFill = document.getElementById('confidenceFill');
+            const confidenceText = document.getElementById('confidenceText');
+            
+            confidenceFill.style.width = (confidence * 100) + '%';
+            confidenceFill.className = 'confidence-fill ' + labelClass + '-bg';
+            confidenceText.textContent = (confidence * 100).toFixed(1) + '%';
+
+            // Mostrar probabilidades
+            document.getElementById('confirmedProb').textContent = (probabilities.CONFIRMED * 100).toFixed(1) + '%';
+            document.getElementById('candidateProb').textContent = (probabilities.CANDIDATE * 100).toFixed(1) + '%';
+            document.getElementById('falsePositiveProb').textContent = (probabilities.FALSE_POSITIVE * 100).toFixed(1) + '%';
+
+            // Mostrar resultados
+            document.getElementById('results').style.display = 'block';
+            
+            // Mostrar mensaje de éxito
+            document.getElementById('successMessage').textContent = `Predicción realizada con ${result.model_used}`;
+            document.getElementById('successMessage').style.display = 'block';
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        function clearForm() {
+            document.getElementById('predictionForm').reset();
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function loadSampleData(type) {
+            if (!sampleData[type]) {
+                showError('Datos de muestra no disponibles para: ' + type);
+                return;
+            }
+
+            const sample = sampleData[type];
+            const form = document.getElementById('predictionForm');
+
+            // Llenar formulario con datos de muestra
+            Object.keys(sample).forEach(key => {
+                if (key !== 'actual_disposition') {
+                    const input = form.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        input.value = sample[key];
+                    }
+                }
+            });
+
+            // Mostrar mensaje
+            document.getElementById('successMessage').textContent = `Cargado ejemplo de: ${sample.actual_disposition}`;
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

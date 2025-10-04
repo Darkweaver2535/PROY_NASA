@@ -123,6 +123,22 @@
             <h1>🌟 A World Away: Exoplanet AI 🌌</h1>
             <p class="subtitle">Hunting for Exoplanets with Artificial Intelligence</p>
             <p class="subtitle">NASA Datasets: Kepler, K2 & TESS Missions</p>
+            
+            <!-- Navegación -->
+            <div style="margin-top: 20px;">
+                <a href="{% url 'exoplanet_ai:prediction_dashboard' %}" 
+                   style="background: linear-gradient(45deg, #4ecdc4, #45b7d1); 
+                          color: white; padding: 12px 24px; border-radius: 25px; 
+                          text-decoration: none; font-weight: bold; margin-right: 10px;">
+                    🚀 Predictor de Exoplanetas
+                </a>
+                <a href="{% url 'exoplanet_ai:model_comparison' %}" 
+                   style="background: linear-gradient(45deg, #ff6b6b, #ff8e53); 
+                          color: white; padding: 12px 24px; border-radius: 25px; 
+                          text-decoration: none; font-weight: bold;">
+                    🤖 Comparar Modelos ML
+                </a>
+            </div>
         </div>
 
         <!-- Estadísticas principales -->

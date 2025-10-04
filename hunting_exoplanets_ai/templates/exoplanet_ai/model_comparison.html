@@ -1,0 +1,426 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Comparación de Modelos ML - NASA AI Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c2b 0%, #1a1a3a 50%, #2d1b69 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Estrellas de fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: twinkle 20s infinite;
+            z-index: -1;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.3; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navigation {
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .models-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .model-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .model-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .model-card.active {
+            border-color: #4ecdc4;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .model-card.active::before {
+            content: '🥇';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+        }
+
+        .model-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .model-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .model-algorithm {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #ffffff;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .model-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .activate-btn {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+
+        .activate-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .activate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .best { color: #4ecdc4; }
+        .good { color: #ffd93d; }
+        .average { color: #ff8e53; }
+        .poor { color: #ff6b6b; }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .model-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .navigation {
+                text-align: center;
+            }
+            
+            .btn {
+                display: block;
+                margin: 10px auto;
+            }
+        }
+
+        .error {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            color: #ff6b6b;
+        }
+
+        .success {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid #4ecdc4;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            color: #4ecdc4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🤖 Comparación de Modelos ML</h1>
+            <p>Análisis de rendimiento de algoritmos de clasificación de exoplanetas</p>
+            
+            <div class="navigation">
+                <a href="{% url 'home' %}" class="btn btn-secondary">🏠 Dashboard Principal</a>
+                <a href="{% url 'exoplanet_ai:prediction_dashboard' %}" class="btn btn-primary">🚀 Predictor</a>
+            </div>
+        </div>
+
+        <!-- Resumen general -->
+        <div class="summary-card">
+            <h2>📊 Resumen de Modelos</h2>
+            <div class="summary-stats">
+                <div class="summary-item">
+                    <div class="summary-value">{{ models.count }}</div>
+                    <div>Modelos Entrenados</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value best">{{ models.first.f1_score|floatformat:3 }}</div>
+                    <div>Mejor F1-Score</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value best">{{ models.first.accuracy|floatformat:3 }}</div>
+                    <div>Mejor Accuracy</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">{{ models.first.get_algorithm_display }}</div>
+                    <div>Mejor Algoritmo</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de modelos -->
+        <div class="models-grid">
+            {% for model in models %}
+            <div class="model-card {% if model.is_active %}active{% endif %}">
+                <div class="model-header">
+                    <div class="model-name">{{ model.name }}</div>
+                    <div class="model-algorithm">{{ model.get_algorithm_display }}</div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-value {% if model.accuracy >= 0.75 %}best{% elif model.accuracy >= 0.70 %}good{% elif model.accuracy >= 0.65 %}average{% else %}poor{% endif %}">
+                            {{ model.accuracy|floatformat:3 }}
+                        </div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value {% if model.f1_score >= 0.70 %}best{% elif model.f1_score >= 0.65 %}good{% elif model.f1_score >= 0.60 %}average{% else %}poor{% endif %}">
+                            {{ model.f1_score|floatformat:3 }}
+                        </div>
+                        <div class="metric-label">F1-Score</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value {% if model.precision >= 0.70 %}best{% elif model.precision >= 0.65 %}good{% elif model.precision >= 0.60 %}average{% else %}poor{% endif %}">
+                            {{ model.precision|floatformat:3 }}
+                        </div>
+                        <div class="metric-label">Precision</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value {% if model.recall >= 0.70 %}best{% elif model.recall >= 0.65 %}good{% elif model.recall >= 0.60 %}average{% else %}poor{% endif %}">
+                            {{ model.recall|floatformat:3 }}
+                        </div>
+                        <div class="metric-label">Recall</div>
+                    </div>
+                </div>
+
+                <div class="model-info">
+                    <div><strong>Datos de entrenamiento:</strong> {{ model.training_size|default:"N/A" }}</div>
+                    <div><strong>Datos de test:</strong> {{ model.test_size|default:"N/A" }}</div>
+                    <div><strong>Creado:</strong> {{ model.created_at|date:"d/m/Y H:i" }}</div>
+                    <div><strong>Estado:</strong> {% if model.is_active %}🟢 Activo{% else %}⚪ Inactivo{% endif %}</div>
+                </div>
+
+                {% if not model.is_active %}
+                <button class="activate-btn" onclick="activateModel({{ model.id }}, '{{ model.name }}')">
+                    Activar Modelo
+                </button>
+                {% endif %}
+
+                {% if model.notes %}
+                <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 0.8rem;">
+                    <strong>Notas:</strong> {{ model.notes|truncatewords:20 }}
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="model-card">
+                <div style="text-align: center; padding: 40px;">
+                    <h3>🤖 No hay modelos entrenados</h3>
+                    <p>Ejecuta el pipeline de entrenamiento para crear modelos.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div id="message" style="display: none;"></div>
+    </div>
+
+    <script>
+        function activateModel(modelId, modelName) {
+            if (confirm(`¿Activar el modelo "${modelName}"?`)) {
+                fetch('/exoplanet-ai/api/switch-model/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model_id: modelId
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        showMessage(result.message, 'success');
+                        // Recargar página después de 1 segundo
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        showMessage(result.error || 'Error desconocido', 'error');
+                    }
+                })
+                .catch(error => {
+                    showMessage('Error de conexión: ' + error.message, 'error');
+                });
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = type;
+            messageDiv.style.display = 'block';
+            
+            // Ocultar después de 5 segundos
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
