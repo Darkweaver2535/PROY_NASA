@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exoplanet AI - Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #0a0a23;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #ff6b35;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #cccccc;
+            font-size: 1.2em;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #1e1e3f, #2a2a5a);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ff6b35;
+            display: block;
+        }
+        .stat-label {
+            font-size: 1.1em;
+            color: #cccccc;
+            margin-top: 10px;
+        }
+        .section {
+            background: #1e1e3f;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            border: 1px solid #444;
+        }
+        .section h2 {
+            color: #ff6b35;
+            border-bottom: 2px solid #ff6b35;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+        .data-table th {
+            background: #2a2a5a;
+            color: #ff6b35;
+            font-weight: bold;
+        }
+        .data-table tr:hover {
+            background: #2a2a5a;
+        }
+        .mission-kepler { color: #4CAF50; }
+        .mission-k2 { color: #2196F3; }
+        .mission-tess { color: #FF9800; }
+        
+        .disposition-confirmed { color: #4CAF50; font-weight: bold; }
+        .disposition-candidate { color: #FFC107; }
+        .disposition-false-positive { color: #F44336; }
+        .disposition-falsepositive { color: #F44336; }
+        
+        .range-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .range-card {
+            background: #2a2a5a;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .range-value {
+            font-size: 1.5em;
+            color: #ff6b35;
+            font-weight: bold;
+        }
+        .range-label {
+            color: #cccccc;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 A World Away: Exoplanet AI 🌌</h1>
+            <p class="subtitle">Hunting for Exoplanets with Artificial Intelligence</p>
+            <p class="subtitle">NASA Datasets: Kepler, K2 & TESS Missions</p>
+        </div>
+
+        <!-- Estadísticas principales -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number">{{ total_objects|floatformat:0 }}</span>
+                <div class="stat-label">Total Objects</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ confirmed_exoplanets|floatformat:0 }}</span>
+                <div class="stat-label">Confirmed Exoplanets</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ candidates|floatformat:0 }}</span>
+                <div class="stat-label">Planet Candidates</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ false_positives|floatformat:0 }}</span>
+                <div class="stat-label">False Positives</div>
+            </div>
+        </div>
+
+        <!-- Estadísticas por misión -->
+        <div class="section">
+            <h2>📡 Data by NASA Mission</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mission</th>
+                        <th>Objects Count</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mission in mission_stats %}
+                    <tr>
+                        <td class="mission-{{ mission.source_mission|lower }}">
+                            {% if mission.source_mission == 'KEPLER' %}🔭 Kepler{% elif mission.source_mission == 'K2' %}🛰️ K2{% elif mission.source_mission == 'TESS' %}🌟 TESS{% endif %}
+                        </td>
+                        <td>{{ mission.count|floatformat:0 }}</td>
+                        <td>{{ mission.percentage }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Estadísticas por disposición -->
+        <div class="section">
+            <h2>🎯 Classification Distribution</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Disposition</th>
+                        <th>Count</th>
+                        <th>Percentage</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for disposition in disposition_stats %}
+                    <tr>
+                        <td class="disposition-{{ disposition.original_disposition|lower|cut:'_' }}">
+                            {% if disposition.original_disposition == 'CONFIRMED' %}✅ Confirmed
+                            {% elif disposition.original_disposition == 'CANDIDATE' %}🤔 Candidate
+                            {% elif disposition.original_disposition == 'FALSE_POSITIVE' %}❌ False Positive
+                            {% else %}❓ {{ disposition.original_disposition }}{% endif %}
+                        </td>
+                        <td>{{ disposition.count|floatformat:0 }}</td>
+                        <td>{{ disposition.percentage }}%</td>
+                        <td>
+                            {% if disposition.original_disposition == 'CONFIRMED' %}Verified exoplanet
+                            {% elif disposition.original_disposition == 'CANDIDATE' %}Potential exoplanet
+                            {% elif disposition.original_disposition == 'FALSE_POSITIVE' %}Not a planet
+                            {% else %}Other classification{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Rangos de características para ML -->
+        <div class="section">
+            <h2>🔢 Feature Ranges for Machine Learning</h2>
+            
+            <h3>🌍 Orbital Period (Days)</h3>
+            <div class="range-info">
+                <div class="range-card">
+                    <div class="range-value">{{ orbital_period_range.min_period|floatformat:2 }}</div>
+                    <div class="range-label">Minimum</div>
+                </div>
+                <div class="range-card">
+                    <div class="range-value">{{ orbital_period_range.avg_period|floatformat:2 }}</div>
+                    <div class="range-label">Average</div>
+                </div>
+                <div class="range-card">
+                    <div class="range-value">{{ orbital_period_range.max_period|floatformat:2 }}</div>
+                    <div class="range-label">Maximum</div>
+                </div>
+            </div>
+
+            <h3>🪐 Planetary Radius (Earth Radii)</h3>
+            <div class="range-info">
+                <div class="range-card">
+                    <div class="range-value">{{ planetary_radius_range.min_radius|floatformat:3 }}</div>
+                    <div class="range-label">Minimum</div>
+                </div>
+                <div class="range-card">
+                    <div class="range-value">{{ planetary_radius_range.avg_radius|floatformat:3 }}</div>
+                    <div class="range-label">Average</div>
+                </div>
+                <div class="range-card">
+                    <div class="range-value">{{ planetary_radius_range.max_radius|floatformat:3 }}</div>
+                    <div class="range-label">Maximum</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Links útiles -->
+        <div class="section">
+            <h2>🔗 Quick Links</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <a href="/admin/" style="display: block; padding: 15px; background: #2a2a5a; color: #ff6b35; text-decoration: none; border-radius: 8px; text-align: center;">
+                    🛠️ Django Admin
+                </a>
+                <a href="/api/data/" style="display: block; padding: 15px; background: #2a2a5a; color: #ff6b35; text-decoration: none; border-radius: 8px; text-align: center;">
+                    📊 API Data
+                </a>
+                <a href="/models/" style="display: block; padding: 15px; background: #2a2a5a; color: #ff6b35; text-decoration: none; border-radius: 8px; text-align: center;">
+                    🤖 ML Models
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
