@@ -454,24 +454,6 @@
             box-shadow: var(--glow-orange);
         }
 
-        .btn-sample-confirmed {
-            background: linear-gradient(45deg, var(--plasma-green), #00cc44);
-            color: black;
-            box-shadow: var(--glow-green);
-        }
-
-        .btn-sample-candidate {
-            background: linear-gradient(45deg, var(--stellar-gold), #ffaa00);
-            color: black;
-            box-shadow: var(--glow-gold);
-        }
-
-        .btn-sample-false {
-            background: linear-gradient(45deg, var(--danger-red), #cc0044);
-            color: white;
-            box-shadow: 0 0 20px rgba(255, 23, 68, 0.4);
-        }
-
         .quantum-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -954,19 +936,10 @@
 
                     <div class="quantum-button-matrix">
                         <button type="submit" class="quantum-btn btn-primary">
-                            🔮 Predict
+                            Predict
                         </button>
                         <button type="button" class="quantum-btn btn-secondary" onclick="clearQuantumForm()">
-                            🗑️ Clear
-                        </button>
-                        <button type="button" class="quantum-btn btn-sample-confirmed" onclick="loadQuantumSample('confirmed')">
-                            ✅ Confirmed
-                        </button>
-                        <button type="button" class="quantum-btn btn-sample-candidate" onclick="loadQuantumSample('candidate')">
-                            🤔 Candidate
-                        </button>
-                        <button type="button" class="quantum-btn btn-sample-false" onclick="loadQuantumSample('false_positive')">
-                            ❌ False Positive
+                            Clear
                         </button>
                     </div>
                 </form>
@@ -984,7 +957,7 @@
                 <div id="quantumResults" style="display: none;">
                     <div class="quantum-prediction-result">
                         <div class="prediction-label" id="predictionLabel">
-                            🎯 Awaiting quantum analysis...
+                            Awaiting quantum analysis...
                         </div>
                         
                         <div class="quantum-confidence-container">
@@ -1054,16 +1027,6 @@
     </div>
 
     <script>
-        let quantumSampleData = {};
-
-        // Load quantum sample data
-        fetch('/exoplanet-ai/api/sample-data/')
-            .then(response => response.json())
-            .then(data => {
-                quantumSampleData = data.samples;
-            })
-            .catch(error => console.log('Quantum sample data loading error:', error));
-
         // Quantum form submission
         document.getElementById('predictionForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1167,31 +1130,6 @@
             document.getElementById('quantumResults').style.display = 'none';
             document.getElementById('errorMessage').style.display = 'none';
             document.getElementById('successMessage').style.display = 'none';
-        }
-
-        function loadQuantumSample(type) {
-            if (!quantumSampleData[type]) {
-                showQuantumError('Quantum sample data not available for: ' + type);
-                return;
-            }
-
-            const sample = quantumSampleData[type];
-            const form = document.getElementById('predictionForm');
-
-            // Fill form with quantum sample data
-            Object.keys(sample).forEach(key => {
-                if (key !== 'actual_disposition') {
-                    const input = form.querySelector(`[name="${key}"]`);
-                    if (input) {
-                        input.value = sample[key];
-                    }
-                }
-            });
-
-            // Show quantum success message
-            document.getElementById('successMessage').textContent = `🚀 Quantum sample loaded: ${sample.actual_disposition}`;
-            document.getElementById('successMessage').style.display = 'block';
-            document.getElementById('errorMessage').style.display = 'none';
         }
 
         function getCookie(name) {
