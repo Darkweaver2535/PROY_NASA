@@ -1,0 +1,1417 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔄 Neural Training Command Center - NASA AI Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --space-black: #0a0a15;
+            --deep-space: #1a1a2e;
+            --nebula-purple: #2d1b69;
+            --cosmic-blue: #00d4ff;
+            --plasma-green: #39ff14;
+            --solar-orange: #ff6b35;
+            --stellar-gold: #ffd700;
+            --quantum-pink: #ff2d92;
+            --ai-cyan: #00ffff;
+            --danger-red: #ff1744;
+            --warning-amber: #ffab00;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glow-blue: 0 0 30px rgba(0, 212, 255, 0.4);
+            --glow-green: 0 0 30px rgba(57, 255, 20, 0.4);
+            --glow-orange: 0 0 30px rgba(255, 107, 53, 0.4);
+            --glow-gold: 0 0 30px rgba(255, 215, 0, 0.4);
+            --glow-pink: 0 0 30px rgba(255, 45, 146, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: radial-gradient(ellipse at center, var(--deep-space) 0%, var(--space-black) 70%);
+            background-attachment: fixed;
+            color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Enhanced training simulation starfield */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(3px 3px at 25px 40px, var(--ai-cyan), transparent),
+                radial-gradient(2px 2px at 60px 80px, rgba(57, 255, 20, 0.4), transparent),
+                radial-gradient(1px 1px at 120px 60px, var(--stellar-gold), transparent),
+                radial-gradient(2px 2px at 180px 120px, rgba(255, 45, 146, 0.5), transparent),
+                radial-gradient(1px 1px at 240px 40px, var(--solar-orange), transparent);
+            background-repeat: repeat;
+            background-size: 350px 200px;
+            animation: trainingMove 25s linear infinite;
+            z-index: -2;
+            opacity: 0.4;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="0.8" fill="%2300ffff" opacity="0.8"><animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/></circle><circle cx="80" cy="10" r="0.4" fill="%2339ff14" opacity="0.6"><animate attributeName="opacity" values="0.6;0.2;0.6" dur="3s" repeatCount="indefinite"/></circle><circle cx="50" cy="60" r="0.6" fill="%23ffd700" opacity="0.7"><animate attributeName="opacity" values="0.7;0.3;0.7" dur="2.5s" repeatCount="indefinite"/></circle></svg>');
+            background-size: 500px 500px;
+            animation: trainingPulse 10s ease-in-out infinite;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        @keyframes trainingMove {
+            from { transform: translateY(0px) rotate(0deg); }
+            to { transform: translateY(-200px) rotate(360deg); }
+        }
+
+        @keyframes trainingPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            25% { opacity: 0.6; transform: scale(1.02); }
+            75% { opacity: 0.1; transform: scale(0.98); }
+        }
+
+        /* Training data particles */
+        .training-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .training-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, var(--ai-cyan) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: trainingFloat 30s infinite linear;
+            opacity: 0.7;
+        }
+
+        @keyframes trainingFloat {
+            0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(-100px) translateX(200px) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Training Command Header */
+        .training-header {
+            background: linear-gradient(135deg, var(--glass-bg), rgba(0, 255, 255, 0.1));
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--glass-border);
+            border-radius: 35px;
+            padding: 50px;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .training-header::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, var(--ai-cyan), var(--plasma-green), var(--quantum-pink), var(--stellar-gold));
+            border-radius: 35px;
+            z-index: -1;
+            opacity: 0.4;
+            animation: trainingBorderGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes trainingBorderGlow {
+            0% { opacity: 0.4; }
+            100% { opacity: 0.9; }
+        }
+
+        .training-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2.2rem, 4vw, 3.8rem);
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--ai-cyan), var(--plasma-green), var(--stellar-gold));
+            background-size: 300% 300%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: trainingGradientShift 5s ease-in-out infinite;
+            margin-bottom: 20px;
+            text-shadow: var(--glow-blue);
+        }
+
+        @keyframes trainingGradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .training-subtitle {
+            font-size: 1.5rem;
+            color: var(--ai-cyan);
+            margin-bottom: 30px;
+            font-weight: 300;
+            text-shadow: var(--glow-blue);
+        }
+
+        /* Training Navigation */
+        .training-navigation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .training-nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, var(--glass-bg), rgba(0, 255, 255, 0.1));
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .training-nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .training-nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .training-nav-btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--glow-blue);
+            border-color: var(--ai-cyan);
+        }
+
+        .nav-home { background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(255, 193, 7, 0.2)); }
+        .nav-predict { background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(57, 255, 20, 0.2)); }
+        .nav-models { background: linear-gradient(135deg, rgba(255, 171, 0, 0.2), rgba(255, 215, 0, 0.2)); }
+        .nav-data { background: linear-gradient(135deg, rgba(57, 255, 20, 0.2), rgba(40, 167, 69, 0.2)); }
+
+        /* Training Stats Matrix */
+        .training-stats-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .training-stat-card {
+            background: linear-gradient(135deg, var(--glass-bg), rgba(0, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            transition: all 0.4s ease;
+            overflow: hidden;
+        }
+
+        .training-stat-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--ai-cyan), transparent, var(--plasma-green), transparent);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .training-stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .training-stat-card:hover {
+            transform: translateY(-10px) rotateY(5deg);
+            box-shadow: var(--glow-blue);
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: block;
+            text-shadow: var(--glow-blue);
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .confirmed { color: var(--plasma-green); text-shadow: var(--glow-green); }
+        .candidate { color: var(--stellar-gold); text-shadow: var(--glow-gold); }
+        .false-positive { color: var(--danger-red); text-shadow: 0 0 20px rgba(255, 23, 68, 0.4); }
+
+        /* Main Training Content */
+        .training-main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .training-panel {
+            background: linear-gradient(135deg, var(--glass-bg), rgba(0, 255, 255, 0.05));
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 35px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.6rem;
+            color: var(--ai-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .panel-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--ai-cyan), var(--plasma-green));
+            border-radius: 2px;
+        }
+
+        /* Training Algorithm Matrix */
+        .algorithm-matrix {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .algorithm-card {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 255, 255, 0.1));
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .algorithm-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .algorithm-card:hover::before {
+            left: 100%;
+        }
+
+        .algorithm-card:hover {
+            transform: scale(1.03);
+            border-color: var(--ai-cyan);
+            box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .algorithm-card input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: var(--ai-cyan);
+        }
+
+        .algorithm-card label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        /* Training Form Elements */
+        .training-form-group {
+            margin-bottom: 25px;
+        }
+
+        .training-form-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--ai-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .training-form-group input, .training-form-group select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .training-form-group input:focus, .training-form-group select:focus {
+            outline: none;
+            border-color: var(--ai-cyan);
+            box-shadow: var(--glow-blue);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        /* Quantum Range Slider */
+        .quantum-range-container {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .quantum-range {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, var(--ai-cyan), var(--plasma-green));
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .quantum-range:hover {
+            opacity: 1;
+        }
+
+        .quantum-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--ai-cyan);
+            cursor: pointer;
+            box-shadow: var(--glow-blue);
+        }
+
+        .quantum-range::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--ai-cyan);
+            cursor: pointer;
+            border: none;
+            box-shadow: var(--glow-blue);
+        }
+
+        .range-value {
+            position: absolute;
+            right: 0;
+            top: -30px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            color: var(--ai-cyan);
+            text-shadow: var(--glow-blue);
+        }
+
+        /* Training Control Buttons */
+        .training-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .training-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .training-btn:hover::before {
+            left: 100%;
+        }
+
+        .training-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--ai-cyan), #0099cc);
+            color: white;
+            box-shadow: var(--glow-blue);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--plasma-green), #00cc44);
+            color: black;
+            box-shadow: var(--glow-green);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, var(--warning-amber), #ff8f00);
+            color: black;
+            box-shadow: var(--glow-gold);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, var(--danger-red), #cc0044);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 23, 68, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--solar-orange), #ff4400);
+            color: white;
+            box-shadow: var(--glow-orange);
+        }
+
+        .training-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Quantum Progress System */
+        .quantum-progress-container {
+            background: linear-gradient(135deg, var(--glass-bg), rgba(0, 255, 255, 0.05));
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 35px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            margin: 25px 0;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .quantum-progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: progressShimmer 2s infinite;
+        }
+
+        @keyframes progressShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .quantum-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--ai-cyan), var(--plasma-green), var(--stellar-gold));
+            border-radius: 15px;
+            width: 0%;
+            transition: width 0.8s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            color: #000;
+            overflow: hidden;
+        }
+
+        .quantum-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: fillShimmer 1.5s infinite;
+        }
+
+        @keyframes fillShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .training-status-display {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .status-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--ai-cyan);
+            text-shadow: var(--glow-blue);
+            margin-bottom: 15px;
+        }
+
+        /* Training Logs Matrix */
+        .training-logs-matrix {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            max-height: 350px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border-left: 3px solid;
+            transition: all 0.3s ease;
+            animation: logSlide 0.5s ease-out;
+        }
+
+        @keyframes logSlide {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .log-info {
+            color: var(--ai-cyan);
+            border-left-color: var(--ai-cyan);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .log-success {
+            color: var(--plasma-green);
+            border-left-color: var(--plasma-green);
+            background: rgba(57, 255, 20, 0.1);
+        }
+
+        .log-error {
+            color: var(--danger-red);
+            border-left-color: var(--danger-red);
+            background: rgba(255, 23, 68, 0.1);
+        }
+
+        .log-warning {
+            color: var(--warning-amber);
+            border-left-color: var(--warning-amber);
+            background: rgba(255, 171, 0, 0.1);
+        }
+
+        /* Advanced Configuration Panel */
+        .advanced-config-panel {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 255, 255, 0.05));
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 25px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px);
+            display: none;
+        }
+
+        .config-title {
+            font-family: 'Orbitron', monospace;
+            color: var(--stellar-gold);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .param-matrix {
+            display: grid;
+            gap: 15px;
+        }
+
+        .param-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid var(--ai-cyan);
+        }
+
+        .param-label {
+            min-width: 150px;
+            font-weight: 600;
+            color: var(--ai-cyan);
+            margin: 0;
+        }
+
+        .param-input {
+            flex: 1;
+        }
+
+        /* Models Comparison Matrix */
+        .models-matrix {
+            background: linear-gradient(135deg, var(--glass-bg), rgba(0, 255, 255, 0.05));
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 35px;
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-models-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .quantum-models-table th {
+            background: linear-gradient(135deg, var(--deep-space), var(--nebula-purple));
+            color: var(--ai-cyan);
+            padding: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--ai-cyan);
+            font-family: 'Orbitron', monospace;
+        }
+
+        .quantum-models-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .quantum-models-table tr:hover td {
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.1), rgba(57, 255, 20, 0.05));
+            transform: scale(1.01);
+            box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .model-active {
+            background: linear-gradient(90deg, rgba(57, 255, 20, 0.2), rgba(0, 255, 255, 0.1)) !important;
+            border-left: 4px solid var(--plasma-green);
+            box-shadow: inset 0 0 20px rgba(57, 255, 20, 0.3);
+        }
+
+        /* Training Message System */
+        .training-message {
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-top: 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-left: 5px solid;
+            backdrop-filter: blur(15px);
+            animation: trainingMessageSlide 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes trainingMessageSlide {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .training-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: messageShimmer 2s infinite;
+        }
+
+        @keyframes messageShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .message-error {
+            background: linear-gradient(90deg, rgba(255, 23, 68, 0.2), rgba(255, 23, 68, 0.05));
+            border-left-color: var(--danger-red);
+            color: #ffcce5;
+        }
+
+        .message-success {
+            background: linear-gradient(90deg, rgba(57, 255, 20, 0.2), rgba(57, 255, 20, 0.05));
+            border-left-color: var(--plasma-green);
+            color: #ccffdd;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .training-main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .algorithm-matrix {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .training-navigation {
+                grid-template-columns: 1fr;
+            }
+            
+            .training-stats-matrix {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .training-title {
+                font-size: 2.2rem;
+            }
+            
+            .training-header {
+                padding: 30px;
+            }
+            
+            .training-panel {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .training-stats-matrix {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .param-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .param-label {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Training Data Particles -->
+    <div class="training-particles">
+        <div class="training-particle" style="left: 5%; animation-delay: 0s;"></div>
+        <div class="training-particle" style="left: 15%; animation-delay: 5s;"></div>
+        <div class="training-particle" style="left: 25%; animation-delay: 10s;"></div>
+        <div class="training-particle" style="left: 35%; animation-delay: 15s;"></div>
+        <div class="training-particle" style="left: 45%; animation-delay: 20s;"></div>
+        <div class="training-particle" style="left: 55%; animation-delay: 25s;"></div>
+        <div class="training-particle" style="left: 65%; animation-delay: 30s;"></div>
+        <div class="training-particle" style="left: 75%; animation-delay: 35s;"></div>
+        <div class="training-particle" style="left: 85%; animation-delay: 40s;"></div>
+        <div class="training-particle" style="left: 95%; animation-delay: 45s;"></div>
+    </div>
+
+    <div class="container">
+        <!-- Training Command Header -->
+        <header class="training-header">
+            <h1 class="training-title">🔄 NEURAL TRAINING COMMAND CENTER</h1>
+            <p class="training-subtitle">Advanced ML Algorithm Configuration & Training Protocol</p>
+            
+            <nav class="training-navigation">
+                <a href="{% url 'home' %}" class="training-nav-btn nav-home">
+                    🏠 Mission Control
+                </a>
+                <a href="{% url 'exoplanet_ai:prediction_dashboard' %}" class="training-nav-btn nav-predict">
+                    🚀 Quantum Predictor
+                </a>
+                <a href="{% url 'exoplanet_ai:model_comparison' %}" class="training-nav-btn nav-models">
+                    🤖 Neural Networks
+                </a>
+                <a href="{% url 'exoplanet_ai:data_management' %}" class="training-nav-btn nav-data">
+                    📊 Data Command
+                </a>
+            </nav>
+        </header>
+
+        <!-- Training Data Statistics Matrix -->
+        <section class="training-stats-matrix">
+            <div class="training-stat-card">
+                <span class="stat-number">{{ total_data }}</span>
+                <div class="stat-label">Training Objects</div>
+            </div>
+            <div class="training-stat-card">
+                <span class="stat-number confirmed">{{ confirmed_data }}</span>
+                <div class="stat-label">Confirmed Exoplanets</div>
+            </div>
+            <div class="training-stat-card">
+                <span class="stat-number candidate">{{ candidate_data }}</span>
+                <div class="stat-label">Planet Candidates</div>
+            </div>
+            <div class="training-stat-card">
+                <span class="stat-number false-positive">{{ false_positive_data }}</span>
+                <div class="stat-label">False Positives</div>
+            </div>
+        </section>
+
+        <!-- Main Training Content -->
+        <div class="training-main-content">
+            <!-- Training Configuration Panel -->
+            <div class="training-panel">
+                <h2 class="panel-title">⚙️ Training Configuration</h2>
+                
+                <form id="trainingForm">
+                    <div class="training-form-group">
+                        <label>Neural Network Algorithms:</label>
+                        <div class="algorithm-matrix">
+                            <div class="algorithm-card">
+                                <label>
+                                    <input type="checkbox" id="random_forest" name="algorithms" value="random_forest" checked>
+                                    🌲 Random Forest
+                                </label>
+                            </div>
+                            <div class="algorithm-card">
+                                <label>
+                                    <input type="checkbox" id="gradient_boosting" name="algorithms" value="gradient_boosting" checked>
+                                    ⚡ Gradient Boosting
+                                </label>
+                            </div>
+                            <div class="algorithm-card">
+                                <label>
+                                    <input type="checkbox" id="svm" name="algorithms" value="svm" checked>
+                                    🎯 Support Vector Machine
+                                </label>
+                            </div>
+                            <div class="algorithm-card">
+                                <label>
+                                    <input type="checkbox" id="logistic_regression" name="algorithms" value="logistic_regression">
+                                    📈 Logistic Regression
+                                </label>
+                            </div>
+                            <div class="algorithm-card">
+                                <label>
+                                    <input type="checkbox" id="neural_network" name="algorithms" value="neural_network">
+                                    🧠 Deep Neural Network
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="training-form-group">
+                        <label for="testSize">Test Dataset Size:</label>
+                        <div class="quantum-range-container">
+                            <input type="range" id="testSize" name="test_size" min="10" max="40" value="20" step="5" class="quantum-range">
+                            <span class="range-value" id="testSizeValue">20%</span>
+                        </div>
+                    </div>
+
+                    <div class="training-form-group">
+                        <label for="cvFolds">Cross-Validation Protocol:</label>
+                        <select id="cvFolds" name="cv_folds">
+                            <option value="3">🔺 3-Fold Validation</option>
+                            <option value="5" selected>⭐ 5-Fold Validation</option>
+                            <option value="10">💎 10-Fold Validation</option>
+                        </select>
+                    </div>
+
+                    <div class="training-form-group">
+                        <div class="algorithm-card">
+                            <label>
+                                <input type="checkbox" id="useAllData" name="use_all_data" checked>
+                                🌌 Use Complete Dataset
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="training-form-group">
+                        <button type="button" class="training-btn btn-warning" id="advancedBtn">
+                            ⚙️ Advanced Configuration
+                        </button>
+                    </div>
+
+                    <!-- Advanced Hyperparameters Configuration -->
+                    <div class="advanced-config-panel" id="hyperparamsConfig">
+                        <h3 class="config-title">🔧 Quantum Hyperparameters</h3>
+                        <p style="margin-bottom: 20px; opacity: 0.9;">Configure algorithm-specific parameters for optimal performance:</p>
+                        
+                        <div class="param-matrix" id="hyperparamFields">
+                            <!-- Dynamic hyperparameter fields will be generated here -->
+                        </div>
+                    </div>
+
+                    <div class="training-form-group">
+                        <button type="submit" class="training-btn btn-success" id="startTrainingBtn">
+                            🚀 Initiate Training
+                        </button>
+                        <button type="button" class="training-btn btn-danger" id="stopTrainingBtn" disabled>
+                            ⏹️ Abort Training
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Training Monitor Panel -->
+            <div class="training-panel">
+                <h2 class="panel-title">📊 Training Monitor</h2>
+                
+                <div class="training-status-display">
+                    <div class="status-text" id="statusText">
+                        {% if is_training %}
+                            {{ current_step }}
+                        {% else %}
+                            🎯 Systems Ready for Training
+                        {% endif %}
+                    </div>
+                    
+                    <div class="quantum-progress-bar">
+                        <div class="quantum-progress-fill" id="progressFill" style="width: {{ training_progress }}%;">
+                            <span id="progressText">{{ training_progress }}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="training-logs-matrix" id="trainingLogs">
+                    <div class="log-entry log-info">[SYSTEM] Neural training systems initialized and ready</div>
+                </div>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="training-btn btn-primary" id="refreshStatusBtn">
+                        🔄 Refresh Status
+                    </button>
+                    <button class="training-btn btn-secondary" id="clearLogsBtn">
+                        🗑️ Clear Logs
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Models Matrix -->
+        <div class="models-matrix">
+            <h2 class="panel-title">🤖 Current Neural Networks</h2>
+            
+            <table class="quantum-models-table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Network ID</th>
+                        <th>Algorithm</th>
+                        <th>Accuracy</th>
+                        <th>F1-Score</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>Training Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for model in current_models %}
+                    <tr {% if model.is_active %}class="model-active"{% endif %}>
+                        <td>{% if model.is_active %}🟢 ACTIVE{% else %}⚪ STANDBY{% endif %}</td>
+                        <td>{{ model.name }}</td>
+                        <td>{{ model.get_algorithm_display }}</td>
+                        <td>{{ model.accuracy|floatformat:3 }}</td>
+                        <td>{{ model.f1_score|floatformat:3 }}</td>
+                        <td>{{ model.precision|floatformat:3 }}</td>
+                        <td>{{ model.recall|floatformat:3 }}</td>
+                        <td>{{ model.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; opacity: 0.7;">
+                            🤖 No neural networks detected - Initialize training protocol
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Training Message System -->
+        <div id="errorMessage" class="training-message message-error" style="display: none;"></div>
+        <div id="successMessage" class="training-message message-success" style="display: none;"></div>
+    </div>
+
+    <script>
+        let trainingStatusInterval = null;
+        let isTraining = {{ is_training|yesno:"true,false" }};
+
+        // Element references
+        const trainingForm = document.getElementById('trainingForm');
+        const startTrainingBtn = document.getElementById('startTrainingBtn');
+        const stopTrainingBtn = document.getElementById('stopTrainingBtn');
+        const statusText = document.getElementById('statusText');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const trainingLogs = document.getElementById('trainingLogs');
+        const advancedBtn = document.getElementById('advancedBtn');
+        const hyperparamsConfig = document.getElementById('hyperparamsConfig');
+        const testSizeSlider = document.getElementById('testSize');
+        const testSizeValue = document.getElementById('testSizeValue');
+
+        // Configure quantum range slider
+        testSizeSlider.addEventListener('input', function() {
+            testSizeValue.textContent = this.value + '%';
+        });
+
+        // Advanced configuration toggle
+        advancedBtn.addEventListener('click', function() {
+            const isVisible = hyperparamsConfig.style.display === 'block';
+            hyperparamsConfig.style.display = isVisible ? 'none' : 'block';
+            this.innerHTML = isVisible ? 
+                '⚙️ Advanced Configuration' : 
+                '🔼 Hide Configuration';
+        });
+
+        // Training form submission
+        trainingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (isTraining) {
+                showTrainingError('⚠️ Neural training already in progress');
+                return;
+            }
+
+            const formData = new FormData(trainingForm);
+            const algorithms = Array.from(document.querySelectorAll('input[name="algorithms"]:checked')).map(cb => cb.value);
+            
+            if (algorithms.length === 0) {
+                showTrainingError('🚫 Select at least one neural algorithm');
+                return;
+            }
+
+            const config = {
+                algorithms: algorithms,
+                test_size: parseFloat(formData.get('test_size')) / 100,
+                cv_folds: parseInt(formData.get('cv_folds')),
+                use_all_data: formData.get('use_all_data') === 'on',
+                hyperparams: {} // Add custom hyperparameters here
+            };
+
+            initiateTraining(config);
+        });
+
+        function initiateTraining(config) {
+            addTrainingLog('INFO', '🚀 Initiating neural training sequence...');
+            
+            fetch('/exoplanet-ai/training/start/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(config)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    isTraining = true;
+                    updateTrainingUI(true);
+                    addTrainingLog('SUCCESS', '✅ Neural training protocol activated');
+                    addTrainingLog('INFO', `🔧 Configuration: ${JSON.stringify(config)}`);
+                    startTrainingMonitoring();
+                    showTrainingSuccess(result.message || '🎯 Training sequence initiated successfully');
+                } else {
+                    addTrainingLog('ERROR', '❌ Training initiation failed');
+                    showTrainingError(result.error || '🚫 Neural training initialization failed');
+                }
+            })
+            .catch(error => {
+                addTrainingLog('ERROR', `🔌 Connection error: ${error.message}`);
+                showTrainingError('🔌 Neural connection error: ' + error.message);
+            });
+        }
+
+        function abortTraining() {
+            addTrainingLog('WARNING', '⚠️ Initiating training abort sequence...');
+            
+            fetch('/exoplanet-ai/training/stop/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    isTraining = false;
+                    updateTrainingUI(false);
+                    addTrainingLog('WARNING', '⏹️ Training sequence aborted by operator');
+                    stopTrainingMonitoring();
+                    showTrainingSuccess(result.message || '⏹️ Training successfully aborted');
+                } else {
+                    addTrainingLog('ERROR', '❌ Abort sequence failed');
+                    showTrainingError(result.error || '🚫 Training abort failed');
+                }
+            })
+            .catch(error => {
+                addTrainingLog('ERROR', `🔌 Abort connection error: ${error.message}`);
+                showTrainingError('🔌 Abort connection error: ' + error.message);
+            });
+        }
+
+        function updateTrainingUI(training) {
+            startTrainingBtn.disabled = training;
+            stopTrainingBtn.disabled = !training;
+            
+            // Disable form elements during training
+            const formElements = trainingForm.querySelectorAll('input, select, button');
+            formElements.forEach(element => {
+                if (element.id !== 'stopTrainingBtn') {
+                    element.disabled = training;
+                }
+            });
+        }
+
+        function startTrainingMonitoring() {
+            trainingStatusInterval = setInterval(checkTrainingStatus, 3000); // Every 3 seconds
+        }
+
+        function stopTrainingMonitoring() {
+            if (trainingStatusInterval) {
+                clearInterval(trainingStatusInterval);
+                trainingStatusInterval = null;
+            }
+        }
+
+        function checkTrainingStatus() {
+            fetch('/exoplanet-ai/training/status/')
+                .then(response => response.json())
+                .then(status => {
+                    updateTrainingStatus(status);
+                    
+                    if (!status.is_training && isTraining) {
+                        // Training completed
+                        isTraining = false;
+                        updateTrainingUI(false);
+                        stopTrainingMonitoring();
+                        
+                        if (status.trained_models && status.trained_models.length > 0) {
+                            addTrainingLog('SUCCESS', `🎉 Training completed! ${status.trained_models.length} neural networks deployed`);
+                            showTrainingSuccess('🎉 Neural training completed successfully!');
+                            // Reload page after animation
+                            setTimeout(() => location.reload(), 4000);
+                        } else {
+                            addTrainingLog('ERROR', '❌ Training completed with critical errors');
+                            showTrainingError('❌ Training completed with errors');
+                        }
+                    }
+                })
+                .catch(error => {
+                    addTrainingLog('ERROR', `📡 Status monitoring error: ${error.message}`);
+                });
+        }
+
+        function updateTrainingStatus(status) {
+            statusText.textContent = status.current_step;
+            progressFill.style.width = status.progress + '%';
+            progressText.textContent = status.progress + '%';
+            
+            // Add error logs
+            if (status.errors && status.errors.length > 0) {
+                status.errors.forEach(error => {
+                    addTrainingLog('ERROR', `❌ ${error}`);
+                });
+            }
+        }
+
+        function addTrainingLog(type, message) {
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type.toLowerCase()}`;
+            const timestamp = new Date().toLocaleTimeString();
+            logEntry.textContent = `[${timestamp}] [${type}] ${message}`;
+            
+            trainingLogs.appendChild(logEntry);
+            trainingLogs.scrollTop = trainingLogs.scrollHeight;
+            
+            // Limit log entries to prevent memory issues
+            while (trainingLogs.children.length > 50) {
+                trainingLogs.removeChild(trainingLogs.firstChild);
+            }
+        }
+
+        function showTrainingError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 6000);
+        }
+
+        function showTrainingSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 6000);
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Event listeners
+        stopTrainingBtn.addEventListener('click', abortTraining);
+        
+        document.getElementById('refreshStatusBtn').addEventListener('click', function() {
+            if (isTraining) {
+                checkTrainingStatus();
+            }
+            addTrainingLog('INFO', '🔄 System status refreshed manually');
+        });
+        
+        document.getElementById('clearLogsBtn').addEventListener('click', function() {
+            trainingLogs.innerHTML = '<div class="log-entry log-info">[SYSTEM] Training logs cleared - neural monitoring active</div>';
+        });
+
+        // Initialize UI state
+        updateTrainingUI(isTraining);
+        
+        // If training is in progress when page loads
+        if (isTraining) {
+            startTrainingMonitoring();
+            addTrainingLog('INFO', '🔄 Resuming training monitoring...');
+        }
+
+        // Initialize quantum animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add entrance animations
+            const trainingCards = document.querySelectorAll('.training-stat-card, .training-panel, .algorithm-card');
+            trainingCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px) rotateX(10deg)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.8s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0) rotateX(0deg)';
+                }, index * 100);
+            });
+
+            // Add quantum glow effects
+            const quantumElements = document.querySelectorAll('.algorithm-card, .param-row');
+            quantumElements.forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = 'inset 0 0 20px rgba(0, 255, 255, 0.3), 0 0 15px rgba(0, 255, 255, 0.2)';
+                });
+                
+                element.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
