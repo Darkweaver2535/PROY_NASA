@@ -33,8 +33,8 @@ def prediction_dashboard(request):
         'false_positive_percentage': round((false_positive_count / total_objects) * 100, 1) if total_objects > 0 else 0,
         'active_model': {
             'name': 'Random Forest Classifier',
-            'accuracy': 55.9,
-            'features': 17
+            'accuracy': 74.1,
+            'features': 12
         },
     }
     
@@ -99,24 +99,20 @@ def predict_exoplanet(request):
         except Exception as e:
             return JsonResponse({'error': f'Error cargando modelo: {str(e)}'}, status=500)
         
-        # Preparar datos para predicción usando los mismos nombres que en el entrenamiento
+        # Preparar datos para predicción usando los nombres correctos del modelo reentrenado
         input_features = {}
         
-        # Mapear nombres de campos del frontend a nombres del modelo
+        # Mapear nombres de campos del frontend a nombres del modelo correcto
         field_mapping = {
-            'orbital_period': 'koi_period',
-            'transit_duration': 'koi_duration',
-            'planetary_radius': 'koi_prad',
-            'transit_depth': 'koi_depth',
-            'impact_parameter': 'koi_impact',
-            'equilibrium_temperature': 'koi_teq',
-            'stellar_temperature': 'koi_steff',
-            'stellar_radius': 'koi_srad',
-            'stellar_mass': 'koi_smass',
-            'stellar_gravity': 'koi_slogg',
-            'kepler_magnitude': 'koi_kepmag',
-            'ra': 'ra',
-            'dec': 'dec'
+            'orbital_period': 'orbital_period',
+            'transit_duration': 'transit_duration',
+            'planetary_radius': 'planetary_radius',
+            'transit_depth': 'transit_depth',
+            'impact_parameter': 'impact_parameter',
+            'equilibrium_temperature': 'equilibrium_temperature',
+            'stellar_temperature': 'stellar_temperature',
+            'stellar_radius': 'stellar_radius',
+            'stellar_mass': 'stellar_mass'
         }
         
         # Preparar features según el modelo entrenado
@@ -134,6 +130,8 @@ def predict_exoplanet(request):
             input_features['mission_KEPLER'] = 1.0
         if 'mission_K2' in feature_columns:
             input_features['mission_K2'] = 0.0
+        if 'mission_TESS' in feature_columns:
+            input_features['mission_TESS'] = 0.0
         
         # Crear DataFrame con el orden correcto de features
         input_data = pd.DataFrame([input_features])
@@ -165,11 +163,11 @@ def predict_exoplanet(request):
             'confidence': confidence,
             'probabilities': probabilities,
             'model_used': 'Random Forest (Best Model)',
-            'model_accuracy': '55.9%',
+            'model_accuracy': '74.1%',
             'input_data': {
-                'orbital_period': input_features.get('koi_period', 0),
-                'transit_duration': input_features.get('koi_duration', 0),
-                'planetary_radius': input_features.get('koi_prad', 0),
+                'orbital_period': input_features.get('orbital_period', 0),
+                'transit_duration': input_features.get('transit_duration', 0),
+                'planetary_radius': input_features.get('planetary_radius', 0),
                 'features_used': len(feature_columns)
             }
         })
